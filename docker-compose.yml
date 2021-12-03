@@ -1,0 +1,18 @@
+version: "2"
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: "products_app"
+      MYSQL_ROOT_PASSWORD: "root"
+    ports:
+      - 3307:3306
+    volumes:
+      - ./MySql/data:/var/lib/mysql
+  # node:
+  #   build: ./Node
+  #   # context: ./Node
+  #   # dockerfile: Dockerfile
+  #   # environment:
+  #   ports:
+  #     - 5000:5000
