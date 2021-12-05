@@ -1,23 +1,15 @@
-import express from "express";
-import mysql from "mysql2"
+import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 
-import { producstRoute, categoriesRoute} from "./routes"
+import { producstRoute, categoriesRoute } from './routes';
+
 const app: express.Application = express();
-app.use(express.json())
+app.use(express.json());
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    port: 3307,
-    password: 'root',
-    database: 'products_app'
-})
+app.use('/products', producstRoute);
+app.use('/products', categoriesRoute);
 
-
-app.use('/products', producstRoute)
-app.use('/products', categoriesRoute)
-
-
-app.listen(5000, () => {
-    console.log('server running');
-})
+app.listen(process.env.PORT, () => {
+  console.log('server running');
+});

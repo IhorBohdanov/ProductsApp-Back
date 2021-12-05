@@ -1,5 +1,5 @@
-import express from "express";
-const router: express.Router = express.Router()
+import express from 'express';
+const router: express.Router = express.Router();
 // const User = require('../models/user')
 // const bcrypt = require('bcrypt')
 // const rounds = 10
@@ -9,10 +9,10 @@ const router: express.Router = express.Router()
 
 // const middleware = require('../middlewares')
 
-router.get('/', (req: express.Request , res: express.Response) => {
-    return res.json({
-        data: 'sdfsdfs',
-    })
+router.get('/', (req: express.Request, res: express.Response) => {
+  return res.json({
+    data: 'sdfsdfs'
+  });
 });
 
 export const categoriesRoute = router;

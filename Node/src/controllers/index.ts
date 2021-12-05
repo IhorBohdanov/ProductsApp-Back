@@ -1,2 +1,2 @@
 export * from './categories.controller';
-export * from './product.controller';
+export * from './products.controller';

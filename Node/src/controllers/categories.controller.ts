@@ -1,19 +1,19 @@
 class CategoriesController {
-    getCategories() {
+  getCategories() {
+    return;
+  }
 
-    }
+  addCategory() {
+    return;
+  }
 
-    addCategory() {
+  editCategories() {
+    return;
+  }
 
-    }
-
-    editCategories() {
-
-    }
-
-    deleteCategories() {
-
-    }
+  deleteCategories() {
+    return;
+  }
 }
 
-export const productsController = new CategoriesController();
+export const categoriesController = new CategoriesController();

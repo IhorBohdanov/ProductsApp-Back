@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `description ` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `price` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
