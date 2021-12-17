@@ -1,18 +1,15 @@
 import express from 'express';
+import CategoriesController from '../controllers/categories.controller';
+import { addCategoryCheck, catchErrors, updateCategoryCheck, deleteCategoryCheck  } from '../utils/validations';
+
 const router: express.Router = express.Router();
-// const User = require('../models/user')
-// const bcrypt = require('bcrypt')
-// const rounds = 10
 
-// const jwt = require('jsonwebtoken')
-// const tokenSecret = process.env.TOKEN_SECRET
+router.get('/', CategoriesController.getCategories);
 
-// const middleware = require('../middlewares')
+router.post('/', addCategoryCheck, catchErrors, CategoriesController.addCategory);
 
-router.get('/', (req: express.Request, res: express.Response) => {
-  return res.json({
-    data: 'sdfsdfs'
-  });
-});
+router.put('/:id', updateCategoryCheck, catchErrors, CategoriesController.updateCategory);
+
+router.delete('/:id', deleteCategoryCheck, catchErrors, CategoriesController.deleteCategory);
 
 export const categoriesRoute = router;

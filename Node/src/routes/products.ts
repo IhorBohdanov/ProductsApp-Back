@@ -1,23 +1,17 @@
 import express from 'express';
-import { productsController } from '../controllers';
+import ProductsController from '../controllers/products.controller';
+import { addProductCheck, catchErrors, getProductByIdCheck, updateProductCheck, deleteProductCheck } from '../utils/validations';
 
 const router: express.Router = express.Router();
 
-// const User = require('../models/user')
-// const bcrypt = require('bcrypt')
-// const rounds = 10
+router.get('/', ProductsController.getProducts);
 
-// const jwt = require('jsonwebtoken')
-// const tokenSecret = process.env.TOKEN_SECRET
+router.post('/', addProductCheck, catchErrors, ProductsController.addProduct);
 
-// const middleware = require('../middlewares')
+router.get('/:id', getProductByIdCheck, catchErrors, ProductsController.getProductById);
 
-router.get('/', async (req: express.Request, res: express.Response) => {
-  res.json({ data: await productsController.getProducts() });
-});
+router.put('/:id', updateProductCheck, catchErrors, ProductsController.updateProduct);
 
-router.post('/', async (req: express.Request, res: express.Response) => {
-  res.json({ data: await productsController.addProduct() });
-});
+router.delete('/:id', deleteProductCheck, catchErrors, ProductsController.deleteProduct);
 
 export const producstRoute = router;
