@@ -1,9 +1,9 @@
-declare namespace Validation {
-  type Error = string;
+namespace Validation {
+  export type Error = string;
 
-  type Errors = Array<Error>;
+  export type Errors = Array<Error>;
 
-  interface ValidationResult {
+  export interface ValidationResult {
     valid: boolean,
     errors: Errors
   }

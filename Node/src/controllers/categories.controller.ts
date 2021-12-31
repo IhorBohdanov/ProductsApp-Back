@@ -1,7 +1,7 @@
 import '../namespaces/validation.ts';
 import '../namespaces/products.ts';
 
-import { Request, Response} from 'express';
+import { Request, Response } from 'express';
 import { productsModel } from '../models';
 
 class CategoriesController {
@@ -11,26 +11,23 @@ class CategoriesController {
     this.productsModel = productsModel;
   }
 
-  private _makeErrorResponse(errors: Validation.Errors) {
-    return {
-      success: false,
-      error: errors
-    };
-  }
-
-  private _makeSuccessResponse(data: any) {
-    return {
-      success: true,
-      data: data
-    };
-  }
-
   getCategories = async (req: Request, res: Response) => {
     try {
       const data = await this.productsModel.getCategories();
-      res.json(this._makeSuccessResponse(data));
+      const result = {
+        success: true,
+        data
+      }
+
+      res.json(result);
     } catch (error: any) {
-      res.json(this._makeErrorResponse(['Failed to get a categories.']));
+      const result = {
+        success: false,
+        errors: [
+          error
+        ]
+      }
+      res.status(500).json(result);
     }
   }
 
@@ -39,21 +36,45 @@ class CategoriesController {
 
     try {
       await this.productsModel.addCategory(category);
-      res.json(this._makeSuccessResponse(category));
+      const result = {
+        success: true,
+        data: category
+      }
+      res.status(201).json(result);
     } catch (error: any) {
-      res.json(this._makeErrorResponse(['Failed to add a category.']));
+      const result = {
+        success: false,
+        errors: [
+          {
+            msg: "Failed to add category"
+          }
+        ]
+      }
+      res.status(500).json(result);
     }
   }
 
   updateCategory = async (req: Request, res: Response) => {
     const id: Products.ID = +req.params.id;
     const category: Products.Product = req.body;
-
     try {
-      await this.productsModel.updateCategory({ ...category, id }); 
-      res.json(this._makeSuccessResponse({ message: 'success' }));
+      await this.productsModel.updateCategory({ ...category, id });
+      const result = {
+        success: true,
+        data: category
+      }
+
+      res.json(result);
     } catch (error: any) {
-      res.json(this._makeErrorResponse(['Failed to update a product.']));
+      const result = {
+        success: false,
+        errors: [
+          {
+            msg: 'Failed to update a product'
+          }
+        ]
+      }
+      res.status(500).json(result);
     }
   }
 
@@ -61,10 +82,23 @@ class CategoriesController {
     const id: Products.ID = +req.params.id;
 
     try {
-      await this.productsModel.deleteCategory(id); 
-      res.json(this._makeSuccessResponse({ message: 'success' }));
+      await this.productsModel.deleteCategory(id);
+      const result = {
+        success: true
+      }
+
+      res.json(result);
     } catch (error: any) {
-      res.json(this._makeErrorResponse(['Failed to delete a product.']));
+      const result = {
+        success: false,
+        errors: [
+          {
+            msg: 'Failed to delete a product'
+          }
+        ]
+      }
+
+      res.status(500).json(result);
     }
   }
 }

@@ -1,7 +1,5 @@
 import { check, param, validationResult } from 'express-validator';
-import { Request, Response, NextFunction } from 'express';
-
-const MIN_PRODUCT_NAME_LENGTH = 3;
+import { Request, Response, NextFunction } from 'express';const MIN_PRODUCT_NAME_LENGTH = 3;
 const MAX_PRODUCT_NAME_LENGTH = 10;
 const MAX_DESCRIPTION_LENGTH = 100;
 const MAX_PRICE_VALUE = 9999;
@@ -13,7 +11,7 @@ interface lengthParams {
 }
 
 const isLength = ({ min, max }: lengthParams) => {
-  if (min && max) {
+    if (min && max) {
     return `must contain from ${min} to ${max} characters`;
   }
 
@@ -97,4 +95,4 @@ export const catchErrors = (req: Request, res: Response, next: NextFunction) => 
   if (!err.isEmpty()) return res.status(400).json(err);
 
   return next();
-};
+}

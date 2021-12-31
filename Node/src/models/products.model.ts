@@ -21,7 +21,8 @@ class ProductsModel {
     return new Promise((resolve, reject) => {
       this.connection.query(
         QueryString.GET_PRODUCTS,
-        (error: Error, data: Array<Products.Product>) => {
+        (error: Error, data: Array<Products.Product>, fields: any) => {
+
           if (error) {
             return reject(error);
           }
