@@ -4,7 +4,7 @@ var cors = require('cors');
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { producstRoute, categoriesRoute } from './routes';
+import { productsRoute, categoriesRoute } from './routes';
 
 const app: express.Application = express();
 app.use(
@@ -12,7 +12,7 @@ app.use(
   express.json()
 );
 
-app.use('/products', producstRoute);
+app.use('/products', productsRoute);
 app.use('/categories', categoriesRoute);
 
 app.listen(process.env.PORT, () => {

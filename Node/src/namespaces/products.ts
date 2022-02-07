@@ -4,6 +4,7 @@ namespace Products {
     name: string;
     description: string;
     price: number;
+    category: Array<Number>;
   }
 
   export interface Category {
@@ -13,5 +14,9 @@ namespace Products {
 
   export type ID = number;
 
-  export type ProductsResult = Array<Product> | Error;
+  export type ProductsResult = Product[] | Error;
+  export interface ProductsResultExtended  {
+    data: ProductsResult,
+    total?: number
+  }
 }

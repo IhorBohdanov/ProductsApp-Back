@@ -1,7 +1,7 @@
 import '../namespaces/validation.ts';
 import '../namespaces/products.ts';
 
-import { Request, Response} from 'express';
+import e, { Request, Response} from 'express';
 import { productsModel } from '../models';
 
 class ProductsController {
@@ -26,23 +26,36 @@ class ProductsController {
   }
 
   getProducts = async (req: Request, res: Response) => {
-    // minPrice
-    // maxPrice
-    // category
-    // query
-    // page
-    // pageSize
+
+    const {
+      minPrice,
+      maxPrice,
+      search,
+      category,
+      page,
+      pageSize,
+    } = req.query
     
     try {
-      const data = await this.productsModel.getProducts();
+      const { data, total } = await this.productsModel.getProducts({
+        minPrice,
+        maxPrice,
+        search,
+        category,
+        page,
+        pageSize,
+      });
       const result = {
         success: true,
         data,
+        total,
+        page,
+        pageSize,
       }
 
-      console.log(result);
       res.json(result);
     } catch (error: any) {
+      console.log(error)
       const result = {
         success: false,
         errors: [
@@ -60,10 +73,10 @@ class ProductsController {
     const product: Products.Product = req.body;
 
     try {
-      await this.productsModel.addProduct(product);
+      const newProduct = await this.productsModel.addProduct(product);
       const result = {
         success: true,
-        data: product
+        data: newProduct
       }
       res.status(201).json(result);      
     } catch (error: any) {
@@ -71,7 +84,7 @@ class ProductsController {
         success: false,
         errors: [
           {
-            msg: 'Failed to add product'
+            msg: error?.message || 'Failed to add product'
           }
         ]
       }
@@ -95,11 +108,11 @@ class ProductsController {
         success: false,
         errors: [
           {
-            msg: 'Failed to get product' 
+            msg: error.message || 'Failed to get product' 
           }
         ]
       }
-      res.json(result);
+      res.status(404).json(result);
     }
   }
 
@@ -122,7 +135,7 @@ class ProductsController {
         success: false,
         errors: [
           {
-            msg: 'Failed to update a product'
+            msg: error.message || 'Failed to update a product'
           }
         ]
       }
@@ -134,15 +147,18 @@ class ProductsController {
     const id: Products.ID = +req.params.id;
 
     try {
-      const result = await this.productsModel.deleteProduct(id); 
+      await this.productsModel.deleteProduct(id); 
+      const response = {
+        success: true,
+      }
 
-      res.json(result);
+      res.json(response);
     } catch (error: any) {
       const result = {
         success: false,
         errors: [
           {
-            msg: 'Failed to delete a product'
+            msg: error.message || 'Failed to delete a product'
           }
         ]
       }

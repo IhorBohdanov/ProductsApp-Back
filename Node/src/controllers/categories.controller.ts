@@ -35,10 +35,10 @@ class CategoriesController {
     const category: Products.Category = req.body;
 
     try {
-      await this.productsModel.addCategory(category);
+      const newCategory = await this.productsModel.addCategory(category);
       const result = {
         success: true,
-        data: category
+        data: newCategory
       }
       res.status(201).json(result);
     } catch (error: any) {
@@ -61,7 +61,12 @@ class CategoriesController {
       await this.productsModel.updateCategory({ ...category, id });
       const result = {
         success: true,
-        data: category
+        data: [
+          {
+            id,
+            ...category,
+          }
+        ]
       }
 
       res.json(result);
@@ -70,7 +75,7 @@ class CategoriesController {
         success: false,
         errors: [
           {
-            msg: 'Failed to update a product'
+            msg: error.message || 'Failed to update a product'
           }
         ]
       }
@@ -93,7 +98,7 @@ class CategoriesController {
         success: false,
         errors: [
           {
-            msg: 'Failed to delete a product'
+            msg: error.message || 'Failed to delete a category'
           }
         ]
       }
