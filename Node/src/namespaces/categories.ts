@@ -1,4 +1,4 @@
-export namespace Categories {
+namespace Categories {
   export interface ExistingCategory {
     id: number,
     name: string

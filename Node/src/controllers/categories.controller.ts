@@ -1,5 +1,5 @@
-import '../namespaces/validation.ts';
-import '../namespaces/products.ts';
+/// <reference path="../namespaces/validation.ts" />
+/// <reference path="../namespaces/products.ts" />
 
 import { Request, Response } from 'express';
 import { productsModel } from '../models';

@@ -5,7 +5,6 @@ import Connection, {
   ConnectionOptions,
 } from 'mysql2/typings/mysql/lib/Connection';
 import { resolve } from 'path/posix';
-import { Categories } from '../namespaces/categories';
 
 import { QueryString, makeProductsQueryString } from './queries';
 
