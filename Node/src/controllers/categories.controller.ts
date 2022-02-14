@@ -17,7 +17,7 @@ class CategoriesController {
       const result = {
         success: true,
         data
-      }
+      };
 
       res.json(result);
     } catch (error: any) {
@@ -26,8 +26,31 @@ class CategoriesController {
         errors: [
           error
         ]
-      }
+      };
       res.status(500).json(result);
+    }
+  }
+
+  getCategoryById = async (req: Request, res: Response) => {
+    const id: Products.ID = +req.params.id;
+
+    try {
+      const data = await this.productsModel.getCategoryById(id);
+      const result = {
+        success: true,
+        data,
+      };
+      res.json(result);
+    } catch (error: any) {
+      const result = {
+        success: false,
+        errors: [
+          {
+            msg: error.message || 'Failed to get product' 
+          }
+        ]
+      };
+      res.status(404).json(result);
     }
   }
 
@@ -39,17 +62,17 @@ class CategoriesController {
       const result = {
         success: true,
         data: newCategory
-      }
+      };
       res.status(201).json(result);
     } catch (error: any) {
       const result = {
         success: false,
         errors: [
           {
-            msg: "Failed to add category"
+            msg: 'Failed to add category'
           }
         ]
-      }
+      };
       res.status(500).json(result);
     }
   }
@@ -67,7 +90,7 @@ class CategoriesController {
             ...category,
           }
         ]
-      }
+      };
 
       res.json(result);
     } catch (error: any) {
@@ -78,7 +101,7 @@ class CategoriesController {
             msg: error.message || 'Failed to update a product'
           }
         ]
-      }
+      };
       res.status(500).json(result);
     }
   }
@@ -90,7 +113,7 @@ class CategoriesController {
       await this.productsModel.deleteCategory(id);
       const result = {
         success: true
-      }
+      };
 
       res.json(result);
     } catch (error: any) {
@@ -101,7 +124,7 @@ class CategoriesController {
             msg: error.message || 'Failed to delete a category'
           }
         ]
-      }
+      };
 
       res.status(500).json(result);
     }

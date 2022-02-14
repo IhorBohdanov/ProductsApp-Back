@@ -1,42 +1,45 @@
 /// <reference path="../namespaces/products.ts" />
 
-import { rejects } from 'assert/strict';
 const mysql = require('mysql2/promise');
 import Connection, {
   ConnectionOptions,
 } from 'mysql2/typings/mysql/lib/Connection';
+import { resolve } from 'path/posix';
+import { Categories } from '../namespaces/categories';
 
-// const from 'mysql2/typings/mysql/lib';
 import { QueryString, makeProductsQueryString } from './queries';
 
 enum ColumnNames {
   PRICE = 'price',
   NAME = 'name',
   DESCRIPTION = 'description',
+  CATEGORY = 'category_id',
 }
 
 class ProductsModel {
-  private connection: any; //TODO Change to Connection
+  private connection: any; // Connection type mus be here, 
+  // but 'Property 'connection' has no initializer and is not definitely assigned in the constructor'
+  // error appears. Constructor can't be asynchronous in my app 
   private connectionParams: ConnectionOptions;
 
   constructor(params: ConnectionOptions) {
     this.connectionParams = params;
   }
 
-  async _createConnection() {
+  private async _createConnection() {
     if (!this.connection) {
       this.connection = await mysql.createConnection(this.connectionParams);
     }
   }
 
-  _processProductResponse(respArr: any)  {
-    return respArr.map((item: any) => ({...item, category: item.category ? item.category.split(',').map(Number) : []}))
+  private _processProductResponse(respArr: Array<Products.ProductRaw>): Array<Products.Product>  {
+    return respArr.map((item: any) => ({...item, category: item.category ? item.category.split(',').map(Number) : []}));
   }
 
-  _getQueryFromOptions(options: any): any {
+  private _getQueryFromOptions(options: Products.Filters): Products.FiltersResult {
     const conditionsArray: Array<string> = [];
-    let resultQuery: string = '';
-    let pagination: string = '';
+    let resultQuery = '';
+    let pagination = '';
 
     const {
       minPrice,
@@ -62,8 +65,10 @@ class ProductsModel {
     }
 
     if (category) {
-      conditionsArray.push()
-    }
+      conditionsArray.push(`${ColumnNames.CATEGORY} 
+      ${QueryString.IN} 
+      (${category})`);
+    } 
 
     if (conditionsArray.length) {
       resultQuery += QueryString.WHERE;
@@ -86,7 +91,7 @@ class ProductsModel {
     return { query: resultQuery, pagination };
   }
 
-  async getProducts(options: any): Promise<Products.ProductsResultExtended> {
+  async getProducts(options: Products.Filters): Promise<Products.ProductsResultExtended> {
     const filtersParams: any = this._getQueryFromOptions(options);
     const query:string = makeProductsQueryString(filtersParams);
     
@@ -99,24 +104,24 @@ class ProductsModel {
     return { data, total: rowsCount[0].count };
   }
 
-  async addProduct(product: Products.Product) {
+  async addProduct(product: Products.Product): Promise<Products.Product> {
     await this._createConnection();
     await this.connection.execute(QueryString.TRANSACTION_ISOLATION_LEVEL);
-    await this.connection.beginTransaction()
+    await this.connection.beginTransaction();
 
     try {
       const [categories,] = await this.connection.execute(QueryString.GET_CATEGORIES);
       if (categories.length < 1) throw new Error('There is no categories added');
 
-      const categoriesIds = categories.map((cat: any): any => cat.id);
-      let difference = product.category.filter((catId: Number): Boolean => !categoriesIds.includes(catId));
+      const categoriesIds = categories.map((cat: Categories.ExistingCategory): number => cat.id);
+      const difference: Array<number> = product.category.filter((catId: number): boolean => !categoriesIds.includes(catId));
       if (difference.length) throw new Error('You try to add product with non-existent category');
 
       await this.connection.execute(QueryString.ADD_NEW_PRODUCT, [product.name, product.description, product.price]);
       const [data] = await this.connection.execute(QueryString.GET_LAST_PRODUCT_ID);
-      const lastProductId = data[0].id;
+      const lastProductId: number = data[0].id;
 
-      for (let cat of product.category) {
+      for (const cat of product.category) {
         await this.connection.execute(QueryString.ADD_PRODUCT_CATEGORY, [lastProductId, cat]);
       }
 
@@ -125,10 +130,10 @@ class ProductsModel {
       return {
         id: lastProductId,
         ...product,
-      }
+      };
     } catch (error) {
       this.connection.rollback();
-      throw error
+      throw error;
     }
   }
 
@@ -143,11 +148,11 @@ class ProductsModel {
       await this.connection.commit();
     } catch (error) {
       this.connection.rollback();
-      throw (error)
+      throw (error);
     }
   }
 
-  async getProductById(id: Products.ID) {
+  async getProductById(id: Products.ID): Promise<Products.ProductsResult> {
     await this._createConnection();
     const [data] = await this.connection.execute(QueryString.GET_PRODUCT_BY_ID, [id]);
     if (!data.length) throw new Error(`Product with id=${id} doesn't exist`);
@@ -156,17 +161,37 @@ class ProductsModel {
 
   async updateProduct(product: Products.Product) {
     await this._createConnection();
-    const [data] = await this.connection.execute(QueryString.UPDATE_PRODUCT, [product.name, product.description, product.price, product.id]);
-    if (data.affectedRows < 1) throw new Error(`Product with id=${product.id} doesn't exist`);
+    await this.connection.beginTransaction();
+
+    try {
+      const [data] = await this.connection.execute(QueryString.UPDATE_PRODUCT, [product.name, product.description, product.price, product.id]);
+      if (data.affectedRows < 1) throw new Error(`Product with id=${product.id} doesn't exist`);
+      await this.connection.execute(QueryString.DELETE_PRODUCT_CATEGORIES, [product.id]);
+
+      for (const cat of product.category) {
+        await this.connection.execute(QueryString.ADD_PRODUCT_CATEGORY, [product.id, cat]);
+      }
+      await this.connection.commit();
+    } catch(error) {
+      this.connection.rollback();
+      throw error;
+    }
   }
 
-  async getCategories(): Promise<Products.ProductsResult> {
+  async getCategories(): Promise<Categories.CategoriesResult> {
     await this._createConnection();
     const [data] = await this.connection.execute(QueryString.GET_CATEGORIES);
     return data;
   }
 
-  async addCategory(category: Products.Category) {
+  async getCategoryById(id: Categories.ID): Promise<Products.ProductsResult> {
+    await this._createConnection();
+    const [data] = await this.connection.execute(QueryString.GET_CATEGORY_BY_ID, [id]);
+    if (!data.length) throw new Error(`Category with id=${id} doesn't exist`);
+    return this._processProductResponse(data);
+  }
+
+  async addCategory(category: Categories.Category): Promise<Categories.Category>  {
     await this._createConnection();
     await this.connection.execute(QueryString.ADD_CATEGORY, [category.name]);
 
@@ -176,7 +201,7 @@ class ProductsModel {
     return {
       id,
       ...category,
-    }
+    };
   }
 
   async updateCategory(category: Products.Category) {
@@ -185,7 +210,7 @@ class ProductsModel {
     if (data.affectedRows < 1) throw new Error(`Category with id=${category.id} doesn't exist`);
   }
 
-  async deleteCategory(id: Products.ID) {
+  async deleteCategory(id: Categories.ID) {
     await this._createConnection();
 
     await this.connection.beginTransaction();

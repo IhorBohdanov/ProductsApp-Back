@@ -7,15 +7,7 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc -p .",
-    "prepare": "cd .. && husky install client/.husky",
-    "precommit": "npm lint -- --fix",
     "lint": "eslint --fix --ext .ts ."
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npx pretty-quick --staged ng lint ng test",
-      "pre-push": "ng build --aot true"
-    }
   },
   "repository": {
     "type": "git",

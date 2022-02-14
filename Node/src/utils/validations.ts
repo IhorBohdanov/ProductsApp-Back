@@ -88,7 +88,7 @@ const price = check('price')
   .bail()
   .isNumeric()
   .withMessage(messages.isNumeric)
-  .custom((value) => value >= MIN_PRICE_VALUE && value <= MAX_PRICE_VALUE)
+  .custom((value: number) => value >= MIN_PRICE_VALUE && value <= MAX_PRICE_VALUE)
   .withMessage(messages.value({ min: MIN_PRICE_VALUE, max: MAX_PRICE_VALUE }));
 
 const categories = check('category')
@@ -98,9 +98,9 @@ const categories = check('category')
   .isArray()
   .withMessage(messages.isArray)
   .bail()
-  .custom((value) => value.length > 0)
+  .custom((value: Array<number>) => value.length > 0)
   .withMessage(messages.isEmptyArray)
-  .custom((value) => !value.find((item: any) => typeof item !== 'number'))
+  .custom((value: Array<number>) => !value.find((item: number) => typeof item !== 'number'))
   .withMessage(messages.isNumberArray);
 
 const queryPrice = query(['minPrice', 'maxPrice'])
@@ -108,7 +108,7 @@ const queryPrice = query(['minPrice', 'maxPrice'])
   .isNumeric()
   .withMessage(messages.isNumeric)
   .bail()
-  .custom((value) => value >= MIN_PRICE_VALUE && value <= MAX_PRICE_VALUE)
+  .custom((value: number) => value >= MIN_PRICE_VALUE && value <= MAX_PRICE_VALUE)
   .withMessage(messages.value({ min: MIN_PRICE_VALUE, max: MAX_PRICE_VALUE }));
 
 const queryCategory = query('category')
@@ -116,11 +116,11 @@ const queryCategory = query('category')
   .isString()
   .withMessage(messages.isString)
   .bail()
-  .custom((value) => value.split(CATEGORY_QUERY_SEPARATOR).length)
+  .custom((value: string) => value.split(CATEGORY_QUERY_SEPARATOR).length)
   .withMessage(messages.isStringWithNumbers)
   .bail()
-  .custom((value) => !value.split(CATEGORY_QUERY_SEPARATOR).find((item: any) => !Number(item) ))
-  .withMessage(messages.isStringWithNumbers)
+  .custom((value: string) => !value.split(CATEGORY_QUERY_SEPARATOR).find((item: any) => !Number(item) ))
+  .withMessage(messages.isStringWithNumbers);
 
 const querySearch = query('search')
   .optional()
@@ -135,22 +135,22 @@ const queryPage = query('page')
   .isNumeric()
   .withMessage(messages.isNumeric)
   .bail()
-  .custom((value: any, {req}: any) => req.query.pageSize)
+  .custom((value: number, {req}: any) => req.query.pageSize)
   .withMessage(messages.pageSizeSkip)
   .bail()
   .isLength({ max: MAX_SEARCH_LENGTH })
-  .custom((value) => value >= MIN_PAGE_VALUE)
-  .withMessage(messages.value({ min: MIN_PAGE_VALUE }))
+  .custom((value: number) => value >= MIN_PAGE_VALUE)
+  .withMessage(messages.value({ min: MIN_PAGE_VALUE }));
 
 const queryPageSize = query('pageSize')
   .optional()
   .isNumeric()
   .withMessage(messages.isNumeric)
   .bail()
-  .custom((value: any, {req}: any) => req.query.page)
+  .custom((value: number, {req}: any) => req.query.page)
   .withMessage(messages.pageSkip)
   .bail()
-  .custom((value) => value >= MIN_PAGE_SIZE_VALUE && value <= MAX_PAGE_SIZE_VALUE)
+  .custom((value: number) => value >= MIN_PAGE_SIZE_VALUE && value <= MAX_PAGE_SIZE_VALUE)
   .withMessage(messages.value({ min: MIN_PAGE_SIZE_VALUE, max: MAX_PAGE_SIZE_VALUE }));
 
 export const getProductCheck = [queryPrice, queryCategory, querySearch, queryPage, queryPageSize];
@@ -167,8 +167,8 @@ export const catchErrors = (req: Request, res: Response, next: NextFunction) => 
   const response = {
     success: false,
     ...err,
-  }
+  };
   if (!err.isEmpty()) return res.status(400).json(response);
 
   return next();
-}
+};

@@ -6,6 +6,8 @@ const router: express.Router = express.Router();
 
 router.get('/', CategoriesController.getCategories);
 
+router.get('/:id', CategoriesController.getCategoryById);
+
 router.post('/', addCategoryCheck, catchErrors, CategoriesController.addCategory);
 
 router.put('/:id', updateCategoryCheck, catchErrors, CategoriesController.updateCategory);

@@ -1,12 +1,16 @@
 export namespace Categories {
-  interface ExistingCategory {
+  export interface ExistingCategory {
     id: number,
     name: string
   }
 
-  interface NewCategory {
+  export interface NewCategory {
     name: string
   }
 
+  export type ID = number;
+
   export type Category = ExistingCategory | NewCategory;
+
+  export type CategoriesResult = Array<ExistingCategory>;
 }

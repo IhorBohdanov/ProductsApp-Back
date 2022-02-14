@@ -1,5 +1,5 @@
 import express from 'express';
-var cors = require('cors');
+const cors = require('cors');
 
 import dotenv from 'dotenv';
 dotenv.config();
